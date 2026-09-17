@@ -7,11 +7,11 @@ import { useEditorStore } from '@/store/editorStore'
 import { createClient } from '@/lib/supabase/client'
 import { ThemeSwitcher } from './ThemeSwitcher'
 import { ExportMenu } from './ExportMenu'
-import { DIAGRAM_TEMPLATES } from '@/lib/constants'
+import { TemplatePicker } from './TemplatePicker'
 import { diagramSchema } from '@/lib/validators/diagram'
 import {
-  Save, LayoutTemplate, ChevronDown, Share2, Home, Loader2,
-  CheckCircle, X, Keyboard
+  Save, Share2, Home, Loader2,
+  CheckCircle, X, Keyboard, ArrowLeft, LayoutDashboard,
 } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 
@@ -30,7 +30,6 @@ export function Toolbar({ user, svgRef }: ToolbarProps) {
 
   const [savedFlash, setSavedFlash] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [templateOpen, setTemplateOpen] = useState(false)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [shareLoading, setShareLoading] = useState(false)
   const [showCheatsheet, setShowCheatsheet] = useState(false)
@@ -115,9 +114,25 @@ export function Toolbar({ user, svgRef }: ToolbarProps) {
   return (
     <header className="h-12 border-b border-[var(--border)] bg-[var(--surface)] flex items-center gap-2 px-3 shrink-0">
       {/* Logo / Home */}
-      <Link href="/" className="font-semibold text-sm tracking-tight mr-1 text-[var(--text)]">
+      <Link href={user ? '/dashboard' : '/'} className="font-semibold text-sm tracking-tight text-[var(--text)] hover:opacity-80 transition-opacity">
         Merlin
       </Link>
+
+      {/* Back to Dashboard Button for Logged-in User */}
+      {user && (
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border border-[var(--border)] rounded-lg hover:bg-[var(--paper-100)] text-[var(--text)] transition-colors cursor-pointer shrink-0 ml-1"
+          title="Go back to My Diagrams dashboard"
+        >
+          <ArrowLeft size={12} className="text-[var(--text-muted)]" />
+          <LayoutDashboard size={13} className="text-[var(--accent)]" />
+          <span className="hidden sm:inline">My Diagrams</span>
+        </Link>
+      )}
+
+      {/* Separator */}
+      {user && <span className="text-[var(--border)] select-none">/</span>}
 
       {/* Title */}
       <input
@@ -140,34 +155,7 @@ export function Toolbar({ user, svgRef }: ToolbarProps) {
       <div className="flex-1" />
 
       {/* Templates */}
-      <div className="relative">
-        <button
-          onClick={() => setTemplateOpen(!templateOpen)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm border border-[var(--border)] rounded-lg hover:bg-[var(--paper-100)] transition-colors"
-        >
-          <LayoutTemplate size={14} />
-          Templates
-          <ChevronDown size={12} className={`transition-transform ${templateOpen ? 'rotate-180' : ''}`} />
-        </button>
-        {templateOpen && (
-          <div className="absolute right-0 top-full mt-2 w-52 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg p-1.5 z-50 max-h-80 overflow-y-auto">
-            {DIAGRAM_TEMPLATES.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => {
-                  setCode(t.code)
-                  storeSetTitle(t.label)
-                  setTemplateOpen(false)
-                }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-[var(--paper-100)] transition-colors"
-              >
-                <span className="font-medium">{t.label}</span>
-                <span className="text-xs text-[var(--text-muted)] block">{t.description}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <TemplatePicker />
 
       <ThemeSwitcher />
 

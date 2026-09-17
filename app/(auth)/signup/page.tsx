@@ -2,11 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { GoogleButton } from '@/components/auth/GoogleButton'
 import { EmailPasswordForm } from '@/components/auth/EmailPasswordForm'
+import Plasma from '@/components/landing/Plasma'
+import GlassSurface from '@/components/landing/GlassSurface'
 
 export default function SignupPage() {
+  const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -19,7 +23,7 @@ export default function SignupPage() {
     setSubmittedEmail(email)
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -33,41 +37,118 @@ export default function SignupPage() {
       return
     }
 
+    if (data?.session) {
+      router.push('/dashboard')
+      router.refresh()
+      return
+    }
+
     setSuccess(true)
     setLoading(false)
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
-        <div className="max-w-sm w-full text-center bg-[var(--surface)] border border-[var(--border)] rounded-xl p-8 shadow-sm">
-          <div className="mb-4 text-3xl">✉️</div>
-          <h2 className="text-lg font-semibold mb-2 text-[var(--text)]">Check your email</h2>
-          <p className="text-sm text-[var(--text-muted)]">
-            We sent a confirmation link to <strong className="text-[var(--text)]">{submittedEmail}</strong>. Click it to activate your account.
-          </p>
-          <Link
-            href="/login"
-            className="mt-6 inline-block text-sm text-[var(--accent)] hover:underline font-medium"
+      <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[var(--bg)] px-4 py-12">
+        <div
+          className="absolute inset-0 overflow-hidden pointer-events-none"
+          style={{ transform: 'translate3d(0, 0, 0)', willChange: 'transform' }}
+        >
+          <Plasma 
+            color="#2563eb"
+            speed={0.6}
+            direction="forward"
+            scale={1.1}
+            opacity={0.8}
+            mouseInteractive={false}
+            iterations={32}
+            renderScale={0.45}
+            maxDpr={1.2}
+            targetFps={30}
+          />
+        </div>
+
+        <div className="relative z-10 max-w-sm w-full">
+          <GlassSurface
+            width="100%"
+            height="auto"
+            borderRadius={20}
+            backgroundOpacity={0.12}
+            borderWidth={0.07}
+            distortionScale={-160}
+            redOffset={0}
+            greenOffset={10}
+            blueOffset={20}
+            blur={12}
+            brightness={50}
+            opacity={0.93}
+            saturation={1.4}
+            className="shadow-2xl text-center"
+            contentClassName="p-8 block text-center"
           >
-            Back to sign in
-          </Link>
+            <div className="mb-4 text-3xl">✉️</div>
+            <h2 className="text-lg font-semibold mb-2 text-[var(--text)]">Check your email</h2>
+            <p className="text-sm text-[var(--text-muted)]">
+              We sent a confirmation link to <strong className="text-[var(--text)]">{submittedEmail}</strong>. Click it to activate your account.
+            </p>
+            <Link
+              href="/login"
+              className="mt-6 inline-block text-sm text-[var(--accent)] hover:underline font-medium"
+            >
+              Back to sign in
+            </Link>
+          </GlassSurface>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] px-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <Link href="/" className="font-semibold text-lg tracking-tight text-[var(--text)]">
+    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[var(--bg)] px-4 py-12">
+      {/* Fullscreen Stationary Ambient Plasma Background */}
+      <div
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        style={{ transform: 'translate3d(0, 0, 0)', willChange: 'transform' }}
+      >
+        <Plasma 
+          color="#2563eb"
+          speed={0.6}
+          direction="forward"
+          scale={1.1}
+          opacity={0.8}
+          mouseInteractive={false}
+          iterations={32}
+          renderScale={0.45}
+          maxDpr={1.2}
+          targetFps={30}
+        />
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="mb-6 text-center">
+          <Link href="/" className="font-semibold text-xl tracking-tight text-[var(--text)] hover:opacity-85 transition-opacity">
             Merlin
           </Link>
-          <p className="text-sm text-[var(--text-muted)] mt-2">Create your account</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1.5">Create your account</p>
         </div>
 
-        <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl p-6 shadow-sm">
+        <GlassSurface
+          width="100%"
+          height="auto"
+          borderRadius={20}
+          backgroundOpacity={0.12}
+          borderWidth={0.07}
+          distortionScale={-160}
+          redOffset={0}
+          greenOffset={10}
+          blueOffset={20}
+          blur={12}
+          brightness={50}
+          opacity={0.93}
+          saturation={1.4}
+          className="shadow-2xl"
+          contentClassName="p-6 sm:p-7 block"
+        >
           <GoogleButton onError={(err) => setError(err)} disabled={loading} text="Sign up with Google" />
 
           <div className="my-5 flex items-center gap-3">
@@ -82,7 +163,7 @@ export default function SignupPage() {
             loading={loading}
             error={error}
           />
-        </div>
+        </GlassSurface>
 
         <p className="text-center text-sm text-[var(--text-muted)] mt-5">
           Already have an account?{' '}
@@ -94,3 +175,4 @@ export default function SignupPage() {
     </div>
   )
 }
+

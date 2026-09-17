@@ -39,7 +39,10 @@ export function DiagramCard({ diagram, onDelete, onDuplicate, onRename }: Diagra
     let cancelled = false
     async function load() {
       try {
-        const result = await renderToSvg(diagram.code, `card-${diagram.id}`, diagram.theme)
+        const result = await renderToSvg(diagram.code, `card-${diagram.id}`, {
+          bg: 'dark',
+          lineColor: '#ffffff',
+        })
         if (!cancelled) setSvg(result)
       } catch {
         // invalid diagram — no preview
@@ -78,7 +81,10 @@ export function DiagramCard({ diagram, onDelete, onDuplicate, onRename }: Diagra
     <div className="group border border-[var(--border)] rounded-xl bg-[var(--surface)] overflow-hidden hover:border-[var(--ink-300)] transition-colors">
       {/* Preview thumbnail */}
       <Link href={`/editor/${diagram.id}`} className="block">
-        <div className="h-36 bg-[var(--paper-100)] flex items-center justify-center overflow-hidden p-3">
+        <div
+          className="h-36 bg-[#121214] flex items-center justify-center overflow-hidden p-3 border-b border-[var(--border)]"
+          style={{ '--mermaid-line-color': '#ffffff' } as React.CSSProperties}
+        >
           {svg ? (
             <div
               className="mermaid-preview w-full h-full flex items-center justify-center"

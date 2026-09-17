@@ -73,6 +73,7 @@
 html {
   height: 100%;
   -webkit-text-size-adjust: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -84,6 +85,31 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Sitewide Hardware Acceleration ─────────────────────────────────── */
+/* Promote canvas elements (WebGL Plasma, 3D Cubes, SVG renderers) to dedicated GPU compositor layers */
+canvas {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Offload fixed headers, dynamic glass surfaces, and transitions to GPU */
+header,
+.glass-surface,
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* ─── Tailwind theme mappings ──────────────────────────────────────── */
@@ -113,4 +139,38 @@ body {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+/* Dynamic line color support for Mermaid links, paths, and arrows */
+.mermaid-preview .flowchart-link,
+.mermaid-preview .edgePath .path,
+.mermaid-preview path.edge,
+.mermaid-preview .transition,
+.mermaid-preview .messageLine0,
+.mermaid-preview .messageLine1 {
+  stroke: var(--mermaid-line-color, #ffffff);
+}
+
+.mermaid-preview marker path {
+  fill: var(--mermaid-line-color, #ffffff);
+  stroke: var(--mermaid-line-color, #ffffff);
+}
+
+/* Dynamic node fill color support */
+.mermaid-preview .node rect,
+.mermaid-preview .node circle,
+.mermaid-preview .node ellipse,
+.mermaid-preview .node polygon,
+.mermaid-preview .actor,
+.mermaid-preview .labelBox {
+  fill: var(--mermaid-fill-color, #1c1c20);
+}
+
+/* Dynamic node text color support */
+.mermaid-preview .node text,
+.mermaid-preview .node tspan,
+.mermaid-preview .node .nodeLabel,
+.mermaid-preview .nodeLabel span {
+  fill: var(--mermaid-text-color, currentColor);
+  color: var(--mermaid-text-color, currentColor);
 }

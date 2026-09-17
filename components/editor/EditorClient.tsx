@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { PreviewPane } from '@/components/editor/PreviewPane'
 import { Toolbar } from '@/components/editor/Toolbar'
+import { EditorToast } from '@/components/editor/EditorToast'
 import { useEditorStore } from '@/store/editorStore'
 import type { User } from '@supabase/supabase-js'
 
@@ -105,6 +106,9 @@ export function EditorClient({
           <PreviewPane />
         </div>
       </div>
+
+      {/* Visual notifications toast */}
+      <EditorToast />
     </div>
   )
 }
