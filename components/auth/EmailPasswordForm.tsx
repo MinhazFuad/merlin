@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Eye, EyeOff, Loader2, LogIn, Sparkles } from 'lucide-react'
+import Link from 'next/link'
+import { Eye, EyeOff, Loader2, LogIn } from 'lucide-react'
 import {
   MAX_EMAIL_LENGTH,
   MIN_PASSWORD_LENGTH,
@@ -15,6 +16,10 @@ interface EmailPasswordFormProps {
   onSubmit: (credentials: { email: string; password: string }) => Promise<void>
   loading: boolean
   error: string | null
+  email?: string
+  setEmail?: (val: string) => void
+  password?: string
+  setPassword?: (val: string) => void
 }
 
 export function EmailPasswordForm({
@@ -22,11 +27,20 @@ export function EmailPasswordForm({
   onSubmit,
   loading,
   error,
+  email: externalEmail,
+  setEmail: externalSetEmail,
+  password: externalPassword,
+  setPassword: externalSetPassword,
 }: EmailPasswordFormProps) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [internalEmail, setInternalEmail] = useState('')
+  const [internalPassword, setInternalPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
+
+  const email = externalEmail !== undefined ? externalEmail : internalEmail
+  const setEmail = externalSetEmail || setInternalEmail
+  const password = externalPassword !== undefined ? externalPassword : internalPassword
+  const setPassword = externalSetPassword || setInternalPassword
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -46,9 +60,9 @@ export function EmailPasswordForm({
   const displayError = validationError || error
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium mb-1.5 text-[var(--text)]">
+        <label htmlFor="email" className="block text-xs sm:text-sm font-medium mb-1 text-[var(--text)]">
           Email
         </label>
         <input
@@ -64,12 +78,12 @@ export function EmailPasswordForm({
             if (validationError) setValidationError(null)
           }}
           placeholder="you@example.com"
-          className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent"
+          className="w-full px-3 py-1.5 sm:py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent"
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium mb-1.5 text-[var(--text)]">
+        <label htmlFor="password" className="block text-xs sm:text-sm font-medium mb-1 text-[var(--text)]">
           Password
         </label>
         <div className="relative">
@@ -86,7 +100,7 @@ export function EmailPasswordForm({
               if (validationError) setValidationError(null)
             }}
             placeholder={mode === 'signup' ? 'Min. 8 characters' : '••••••••'}
-            className="w-full px-3 py-2 pr-10 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent"
+            className="w-full px-3 py-1.5 sm:py-2 pr-10 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent"
           />
           <button
             type="button"
@@ -99,18 +113,34 @@ export function EmailPasswordForm({
         </div>
         <div
           className={`transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden ${
-            mode === 'signup' ? 'max-h-8 opacity-100 mt-1.5' : 'max-h-0 opacity-0 mt-0 pointer-events-none'
+            mode === 'signup' ? 'max-h-8 opacity-100 mt-1' : 'max-h-0 opacity-0 mt-0 pointer-events-none'
           }`}
         >
-          <p className="text-xs text-[var(--text-muted)] flex items-center gap-1.5">
+          <p className="text-[11px] sm:text-xs text-[var(--text-muted)] flex items-center gap-1.5">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--text-muted)]" />
             Must be at least 8 characters
           </p>
         </div>
+
+        <div
+          className={`transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden ${
+            mode === 'login' ? 'max-h-8 opacity-100 mt-1' : 'max-h-0 opacity-0 mt-0 pointer-events-none'
+          }`}
+        >
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-xs text-[var(--accent)] hover:underline"
+              tabIndex={mode === 'login' ? 0 : -1}
+            >
+              Forgot password?
+            </Link>
+          </div>
+        </div>
       </div>
 
       {displayError && (
-        <p className="text-sm text-red-500 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg px-3 py-2">
+        <p className="text-sm text-red-500 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg px-3 py-1.5">
           {displayError}
         </p>
       )}
@@ -118,15 +148,13 @@ export function EmailPasswordForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-medium text-sm px-4 py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+        className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-medium text-sm px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
       >
         {loading ? (
           <Loader2 size={16} className="animate-spin" />
         ) : mode === 'login' ? (
           <LogIn size={16} />
-        ) : (
-          <Sparkles size={16} />
-        )}
+        ) : null}
         <span>{mode === 'login' ? 'Sign in' : 'Create free account'}</span>
       </button>
 
@@ -135,7 +163,7 @@ export function EmailPasswordForm({
           mode === 'signup' ? 'max-h-12 opacity-100 pt-0.5' : 'max-h-0 opacity-0 pt-0 pointer-events-none'
         }`}
       >
-        <p className="text-[11px] leading-relaxed text-center text-[var(--text-muted)]">
+        <p className="text-[11px] leading-snug text-center text-[var(--text-muted)]">
           By continuing, you agree to Merlin&apos;s Terms of Service and Privacy Policy.
         </p>
       </div>

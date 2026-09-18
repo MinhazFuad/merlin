@@ -14,12 +14,12 @@ export function AuthTabs({ activeMode, onModeChange }: AuthTabsProps) {
       aria-label="Authentication mode"
       className="relative flex p-1 bg-[var(--bg)]/70 backdrop-blur-xs border border-[var(--border)] rounded-xl mb-6 shadow-inner select-none overflow-hidden"
     >
-      {/* Smooth sliding indicator pill */}
+      {/* GPU-composited sliding indicator pill */}
       <div
-        className="absolute inset-y-1 rounded-lg bg-[var(--surface)] shadow-xs border border-[var(--border)]/60 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none"
+        className="absolute inset-y-1 rounded-lg bg-[var(--surface)] shadow-xs border border-[var(--border)]/60 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none will-change-transform"
         style={{
           width: 'calc(50% - 4px)',
-          transform: activeMode === 'signup' ? 'translateX(calc(100%))' : 'translateX(0%)',
+          transform: activeMode === 'signup' ? 'translate3d(100%, 0, 0)' : 'translate3d(0%, 0, 0)',
           left: '4px',
         }}
         aria-hidden="true"

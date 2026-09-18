@@ -167,7 +167,7 @@ export function TemplateGallery({
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Blank Canvas Tile (Always first when in All or Flows) */}
         {(selectedCategory === 'all' || selectedCategory === 'flows') && !searchQuery && (
-          <div className="group flex flex-col justify-between border-2 border-dashed border-[var(--border)] hover:border-[var(--accent)] rounded-xl p-5 bg-[var(--surface)]/50 hover:bg-[var(--surface)] transition-all">
+          <div className="group flex flex-col justify-between border-2 border-dashed border-[var(--border)] hover:border-[var(--accent)] rounded-xl p-5 bg-[var(--surface)]/80 hover:bg-[var(--surface)] backdrop-blur-xs transition-all">
             <div>
               <div className="w-10 h-10 rounded-lg bg-[var(--paper-100)] flex items-center justify-center text-[var(--text-muted)] group-hover:text-[var(--accent)] group-hover:bg-[var(--accent-muted)] transition-colors mb-4">
                 <Plus size={20} />

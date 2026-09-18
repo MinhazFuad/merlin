@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
         <div className="mb-6 text-center">
           <Link
             href="/"
-            className="font-semibold text-base tracking-tight text-[var(--text-muted)] hover:text-[var(--text)] transition-colors inline-block"
+            className="font-bold text-lg sm:text-xl tracking-tight text-[var(--text-muted)] hover:text-[var(--text)] dark:hover:text-white transition-colors duration-200 inline-block"
           >
             Merlin
           </Link>

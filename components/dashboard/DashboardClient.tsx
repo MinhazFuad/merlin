@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { DiagramGrid } from './DiagramGrid'
 import { TemplateGallery } from './TemplateGallery'
-import Cubes from './Cubes'
+import Plasma from '@/components/landing/Plasma'
 import { createClient } from '@/lib/supabase/client'
 import type { DiagramTemplateItem } from '@/lib/constants'
 import type { User } from '@supabase/supabase-js'
@@ -109,28 +109,24 @@ export function DashboardClient({ user, initialDiagrams }: DashboardClientProps)
 
   return (
     <div className="min-h-screen bg-[var(--bg)] flex flex-col relative overflow-x-hidden">
-      {/* Subtle 3D Cubes Background */}
+      {/* Fullscreen Stationary Ambient Plasma Background */}
       <div
-        className="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center opacity-35 dark:opacity-25"
-        style={{
-          maskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 85%)',
-          WebkitMaskImage: 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, transparent 85%)',
-        }}
+        className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+        style={{ transform: 'translate3d(0, 0, 0)', willChange: 'transform' }}
         aria-hidden="true"
       >
-        <div className="w-[110vw] h-[110vh] max-w-[1500px] max-h-[1500px] flex items-center justify-center">
-          <Cubes
-            gridSize={10}
-            maxAngle={28}
-            radius={3.5}
-            borderStyle="1px solid var(--border)"
-            faceColor="transparent"
-            rippleColor="rgba(37, 99, 235, 0.18)"
-            rippleSpeed={1.5}
-            autoAnimate={true}
-            rippleOnClick={false}
-          />
-        </div>
+        <Plasma 
+          color="#2563eb"
+          speed={0.5}
+          direction="forward"
+          scale={1.1}
+          opacity={0.35}
+          mouseInteractive={false}
+          iterations={30}
+          renderScale={0.45}
+          maxDpr={1.2}
+          targetFps={30}
+        />
       </div>
 
       {/* Header */}
@@ -155,7 +151,7 @@ export function DashboardClient({ user, initialDiagrams }: DashboardClientProps)
           {diagrams.length > 0 && (
             <button
               onClick={() => setIsTemplateModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-[var(--border)] rounded-lg hover:bg-[var(--paper-100)] text-[var(--text)] transition-colors cursor-pointer mr-2"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-[var(--border)] bg-[var(--surface)]/80 hover:bg-[var(--surface)] backdrop-blur-xs rounded-lg text-[var(--text)] transition-colors cursor-pointer mr-2 shadow-xs"
             >
               <Sparkles size={13} className="text-[var(--accent)]" />
               Templates
@@ -196,7 +192,7 @@ export function DashboardClient({ user, initialDiagrams }: DashboardClientProps)
 
             <button
               onClick={() => setIsTemplateModalOpen(true)}
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 text-sm border border-[var(--border)] rounded-lg hover:bg-[var(--paper-100)] text-[var(--text)] font-medium transition-colors cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 text-sm border border-[var(--border)] bg-[var(--surface)]/80 hover:bg-[var(--surface)] backdrop-blur-xs rounded-lg text-[var(--text)] font-medium transition-colors cursor-pointer shadow-xs"
             >
               <Sparkles size={14} className="text-[var(--accent)]" />
               Explore templates

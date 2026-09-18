@@ -38,7 +38,7 @@ export function GoogleButton({
       type="button"
       onClick={handleGoogle}
       disabled={disabled || loading}
-      className="w-full flex items-center justify-center gap-2.5 border border-[var(--border)] rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-[var(--paper-100)] transition-colors disabled:opacity-60 text-[var(--text)] bg-[var(--surface)] cursor-pointer"
+      className="w-full flex items-center justify-center gap-2.5 border border-[var(--border)] rounded-lg px-4 py-2 text-sm font-medium hover:bg-[var(--paper-100)] transition-colors disabled:opacity-60 text-[var(--text)] bg-[var(--surface)] cursor-pointer"
     >
       {loading ? (
         <Loader2 size={16} className="animate-spin" />
