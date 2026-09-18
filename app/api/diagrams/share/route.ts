@@ -3,6 +3,15 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { nanoid } from 'nanoid'
 import { SHARE_SLUG_LENGTH } from '@/lib/constants'
+import { z } from 'zod'
+
+const shareRequestSchema = z.object({
+  diagramId: z
+    .string()
+    .min(1, 'diagramId is required')
+    .max(100, 'diagramId must be 100 characters or fewer')
+    .trim(),
+})
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -12,12 +21,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body = await request.json()
-  const { diagramId } = body
-
-  if (!diagramId) {
-    return NextResponse.json({ error: 'diagramId required' }, { status: 400 })
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
   }
+
+  const parseResult = shareRequestSchema.safeParse(body)
+  if (!parseResult.success) {
+    return NextResponse.json(
+      { error: parseResult.error.issues[0]?.message ?? 'Invalid request payload' },
+      { status: 400 }
+    )
+  }
+
+  const { diagramId } = parseResult.data
 
   // Verify ownership
   const { data: diagram } = await supabase

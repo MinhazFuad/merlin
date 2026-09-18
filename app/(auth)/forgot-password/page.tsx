@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Loader2 } from 'lucide-react'
 import Plasma from '@/components/landing/Plasma'
 import GlassSurface from '@/components/landing/GlassSurface'
+import { emailSchema, MAX_EMAIL_LENGTH } from '@/lib/validators/auth'
 
 export default function ForgotPasswordPage() {
   const supabase = createClient()
@@ -16,15 +17,23 @@ export default function ForgotPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?type=recovery`,
+    const validation = emailSchema.safeParse(email)
+    if (!validation.success) {
+      setError(validation.error.issues[0]?.message ?? 'Please enter a valid email address.')
+      return
+    }
+
+    setLoading(true)
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '')
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(validation.data, {
+      redirectTo: `${siteUrl}/auth/callback?type=recovery`,
     })
 
-    if (error) {
-      setError(error.message)
+    if (resetError) {
+      setError(resetError.message)
       setLoading(false)
       return
     }
@@ -109,10 +118,18 @@ export default function ForgotPasswordPage() {
 
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-6 text-center">
-          <Link href="/" className="font-semibold text-xl tracking-tight text-[var(--text)] hover:opacity-85 transition-opacity">
+          <Link
+            href="/"
+            className="font-semibold text-base tracking-tight text-[var(--text-muted)] hover:text-[var(--text)] transition-colors inline-block"
+          >
             Merlin
           </Link>
-          <p className="text-sm text-[var(--text-muted)] mt-1.5">Reset your password</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--text)] mt-2">
+            Reset your password
+          </h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1">
+            Enter your email and we&apos;ll send you a recovery link
+          </p>
         </div>
 
         <GlassSurface
@@ -141,8 +158,14 @@ export default function ForgotPasswordPage() {
                 id="email"
                 type="email"
                 required
+                maxLength={MAX_EMAIL_LENGTH}
+                autoComplete="email"
+                spellCheck={false}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  if (error) setError(null)
+                }}
                 placeholder="you@example.com"
                 className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] text-sm text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent"
               />

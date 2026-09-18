@@ -137,6 +137,8 @@ export function Toolbar({ user, svgRef }: ToolbarProps) {
       {/* Title */}
       <input
         ref={titleRef}
+        type="text"
+        maxLength={200}
         value={title}
         onChange={(e) => storeSetTitle(e.target.value)}
         className="flex-1 min-w-0 max-w-xs text-sm bg-transparent border-b border-transparent hover:border-[var(--border)] focus:border-[var(--accent)] focus:outline-none px-1 py-0.5 truncate"

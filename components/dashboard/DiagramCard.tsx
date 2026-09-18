@@ -102,6 +102,8 @@ export function DiagramCard({ diagram, onDelete, onDuplicate, onRename }: Diagra
         {renaming ? (
           <input
             ref={renameRef}
+            type="text"
+            maxLength={200}
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             onBlur={commitRename}

@@ -12,7 +12,7 @@ export async function loadMermaid(): Promise<Mermaid> {
   const mermaid = (await import('mermaid')).default
   mermaid.initialize({
     startOnLoad: false,
-    securityLevel: 'loose',
+    securityLevel: 'antiscript',
     fontFamily: 'var(--font-mono, monospace)',
     maxTextSize: 100000,
     maxEdges: 2500,
@@ -88,7 +88,7 @@ async function executeRender(
     mermaid.initialize({
       startOnLoad: false,
       theme: isDark ? 'dark' : 'default',
-      securityLevel: 'loose',
+      securityLevel: 'antiscript',
       fontFamily: 'var(--font-mono, monospace)',
       maxTextSize: 100000,
       maxEdges: 2500,
@@ -163,7 +163,7 @@ async function executeRender(
       mermaid.initialize({
         startOnLoad: false,
         theme: isDark ? 'dark' : 'default',
-        securityLevel: 'loose',
+        securityLevel: 'antiscript',
         fontFamily: 'var(--font-mono, monospace)',
         maxTextSize: 100000,
         maxEdges: 2500,
@@ -209,6 +209,11 @@ export function renderToSvg(
     .trim()
 
   if (!cleanSource) return Promise.resolve('')
+
+  // Protection against excessive payload size causing browser lockup / DoS
+  if (cleanSource.length > 200_000) {
+    return Promise.reject(new Error('Diagram source exceeds maximum safe size'))
+  }
 
   const opts: RenderOptions =
     typeof optionsOrTheme === 'string'
