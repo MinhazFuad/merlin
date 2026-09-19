@@ -87,23 +87,94 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Sitewide Hardware Acceleration ─────────────────────────────────── */
-/* Promote canvas elements (WebGL Plasma, 3D Cubes, SVG renderers) to dedicated GPU compositor layers */
-canvas {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-/* Offload fixed headers, dynamic glass surfaces, and transitions to GPU */
-header,
-.glass-surface,
-.gpu-accelerated {
+/* ─── Sitewide Hardware Acceleration & GPU Compositing ──────────────── */
+/* 1. Canvas & WebGL Compositing Layers */
+canvas,
+[data-gpu-canvas] {
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  /* No perspective here — adding it compounds 3D stacking contexts on top of
+     existing transforms, creating unneeded extra composite layers */
+}
+
+/* 2. Fixed chrome, floating navigations, glass surfaces, and modal dialogs */
+header,
+nav,
+dialog,
+[role="dialog"],
+.glass-surface,
+[class*="backdrop-blur"],
+.gpu-accelerated,
+.gpu-layer {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 3. Smooth Hardware-Accelerated Transforms & Hover Transitions */
+.transform-gpu,
+.gpu-transform {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 4. Vector Graphics & Live Mermaid Previews (Avoid CPU re-rasterization) */
+.mermaid-preview,
+.mermaid-preview svg {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+/* 5. Layout Isolation & Containment for High-Density Grids & Cards */
+.card-contain,
+.diagram-card,
+.template-card {
+  contain: layout paint;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 6. Text Legibility Protection under GPU compositing */
+body,
+button,
+input,
+textarea,
+select {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 7. Fluid Interaction & Hardware Motion Utilities */
+.gpu-smooth {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+}
+
+/* 8. Fixed overlay containers — isolation scopes compositor layers */
+[class*="fixed"][class*="inset-0"],
+[class*="fixed"][class*="pointer-events-none"] {
+  isolation: isolate;
+}
+
+/* 9. Content-visibility: auto skips layout + paint for off-screen card grids */
+.diagram-grid,
+.template-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
 }
 
 @media (prefers-reduced-motion: no-preference) {

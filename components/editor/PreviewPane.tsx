@@ -112,7 +112,8 @@ export function PreviewPane({ code: codeProp, theme: themeProp, readOnly = false
     setScale((s) => Math.min(Math.max(s * delta, 0.1), 10))
   }, [])
 
-  // Pan via drag
+  // Pan via drag with RAF throttling for 60-120fps smooth motion
+  const panRaf = useRef<number | null>(null)
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return
     isPanning.current = true
@@ -120,10 +121,20 @@ export function PreviewPane({ code: codeProp, theme: themeProp, readOnly = false
   }
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isPanning.current) return
-    setTranslate({ x: e.clientX - panStart.current.x, y: e.clientY - panStart.current.y })
+    const nextX = e.clientX - panStart.current.x
+    const nextY = e.clientY - panStart.current.y
+    if (panRaf.current !== null) return
+    panRaf.current = requestAnimationFrame(() => {
+      setTranslate({ x: nextX, y: nextY })
+      panRaf.current = null
+    })
   }
   const handleMouseUp = () => {
     isPanning.current = false
+    if (panRaf.current !== null) {
+      cancelAnimationFrame(panRaf.current)
+      panRaf.current = null
+    }
   }
 
   const fitToScreen = () => {
@@ -219,11 +230,16 @@ export function PreviewPane({ code: codeProp, theme: themeProp, readOnly = false
         onMouseLeave={handleMouseUp}
       >
         <div
-          className="w-full h-full flex items-center justify-center p-6"
+          className="w-full h-full flex items-center justify-center p-6 transform-gpu"
           style={{
-            transform: `translate(${translate.x}px, ${translate.y}px) scale(${scale})`,
+            transform: `translate3d(${translate.x}px, ${translate.y}px, 0) scale(${scale})`,
             transformOrigin: 'center center',
-            transition: isPanning.current ? 'none' : 'transform 0ms',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            // Keep willChange always-on so the browser never demotes this layer
+            // mid-pan, which causes the jank "pop" visible during drag start.
+            willChange: 'transform',
+            transition: isPanning.current ? 'none' : 'transform 120ms cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
           {svgContent ? (

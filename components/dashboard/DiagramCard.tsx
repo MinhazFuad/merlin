@@ -78,7 +78,7 @@ export function DiagramCard({ diagram, onDelete, onDuplicate, onRename }: Diagra
   const updatedAt = formatDistanceToNow(new Date(diagram.updated_at), { addSuffix: true })
 
   return (
-    <div className="group border border-[var(--border)] rounded-xl bg-[var(--surface)] overflow-hidden hover:border-[var(--ink-300)] transition-colors">
+    <div className="group border border-[var(--border)] rounded-xl bg-[var(--surface)] overflow-hidden hover:border-[var(--ink-300)] transition-colors transform-gpu card-contain">
       {/* Preview thumbnail */}
       <Link href={`/editor/${diagram.id}`} className="block">
         <div
@@ -89,7 +89,7 @@ export function DiagramCard({ diagram, onDelete, onDuplicate, onRename }: Diagra
             <div
               className="mermaid-preview w-full h-full flex items-center justify-center"
               dangerouslySetInnerHTML={{ __html: svg }}
-              style={{ transform: 'scale(0.5)', transformOrigin: 'center center' }}
+              style={{ transform: 'scale(0.5) translateZ(0)', transformOrigin: 'center center' }}
             />
           ) : (
             <div className="w-full h-full bg-[var(--paper-200)] rounded animate-pulse" />

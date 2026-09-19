@@ -112,7 +112,6 @@ export function DashboardClient({ user, initialDiagrams }: DashboardClientProps)
       {/* Fullscreen Stationary Ambient Plasma Background */}
       <div
         className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
-        style={{ transform: 'translate3d(0, 0, 0)', willChange: 'transform' }}
         aria-hidden="true"
       >
         <Plasma 

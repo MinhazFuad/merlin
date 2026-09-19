@@ -51,7 +51,7 @@ export default function HeroDiagramWindow() {
   }
 
   return (
-    <div className="w-full max-w-lg lg:max-w-none rounded-2xl border border-[var(--border)] bg-[var(--surface)]/90 backdrop-blur-md shadow-xl dark:shadow-2xl overflow-hidden transition-all duration-300">
+    <div className="w-full max-w-lg lg:max-w-none rounded-2xl border border-[var(--border)] bg-[var(--surface)]/90 backdrop-blur-md shadow-xl dark:shadow-2xl overflow-hidden transition-all duration-300 transform-gpu card-contain will-change-transform">
       {/* Window Title Bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--surface)]/60">
         {/* Window controls & file name */}

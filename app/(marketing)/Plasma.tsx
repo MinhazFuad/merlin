@@ -222,22 +222,15 @@ export const Plasma: React.FC<PlasmaProps> = ({
       };
     };
 
-    let isScrolling = false;
-    let scrollTimeout: ReturnType<typeof setTimeout>;
     const handleScroll = () => {
       invalidateCachedRect();
-      isScrolling = true;
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        isScrolling = false;
-      }, 90);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", invalidateCachedRect, { passive: true });
     if (mouseInteractive) {
+      window.addEventListener("scroll", handleScroll, { passive: true });
       window.addEventListener("mousemove", handleMouseMove, { passive: true });
     }
+    window.addEventListener("resize", invalidateCachedRect, { passive: true });
 
     let resizePending = false;
     const setSize = () => {
@@ -251,6 +244,7 @@ export const Plasma: React.FC<PlasmaProps> = ({
       canvas.style.height = "100%";
       canvas.style.transform = "translate3d(0, 0, 0)";
       canvas.style.willChange = "transform";
+      canvas.style.contain = "strict";
 
       const res = program.uniforms.iResolution.value as Float32Array;
       res[0] = gl.drawingBufferWidth;
@@ -270,31 +264,23 @@ export const Plasma: React.FC<PlasmaProps> = ({
     setSize();
 
     let raf = 0;
+    let rafTimeout = 0;
     let contextLost = false;
     let isVisible = true;
     let tabVisible = document.visibilityState !== "hidden";
     const t0 = performance.now();
+    // For sub-60fps targets, use setTimeout+rAF double-buffer so we don't
+    // waste main-thread invocations on frames we intend to skip.
+    const useThrottle = targetFps < 60;
     const frameInterval = 1000 / targetFps;
-    let lastFrameTime = 0;
 
     const renderStaticFrame = () => {
       (program.uniforms.iTime as any).value = 0;
       renderer.render({ scene: mesh });
     };
 
-    const loop = (t: number) => {
+    const renderFrame = (t: number) => {
       if (contextLost || !isVisible || !tabVisible) return;
-
-      if (isScrolling) {
-        raf = requestAnimationFrame(loop);
-        return;
-      }
-
-      if (t - lastFrameTime < frameInterval) {
-        raf = requestAnimationFrame(loop);
-        return;
-      }
-      lastFrameTime = t;
 
       if (pendingMouse.current) {
         mousePos.current = pendingMouse.current;
@@ -304,7 +290,7 @@ export const Plasma: React.FC<PlasmaProps> = ({
         mouseUniform[1] = mousePos.current.y;
       }
 
-      let timeValue = (t - t0) * 0.001;
+      const timeValue = (t - t0) * 0.001;
       if (direction === "pingpong") {
         const pingpongDuration = 10;
         const segmentTime = timeValue % pingpongDuration;
@@ -320,8 +306,31 @@ export const Plasma: React.FC<PlasmaProps> = ({
         (program.uniforms.iTime as any).value = timeValue;
       }
       renderer.render({ scene: mesh });
-      raf = requestAnimationFrame(loop);
     };
+
+    // Double-buffered scheduler: setTimeout defers to the next eligible frame,
+    // then rAF aligns the actual paint to vsync — zero wasted callbacks.
+    const scheduleNext = () => {
+      if (useThrottle) {
+        rafTimeout = window.setTimeout(() => {
+          raf = requestAnimationFrame((t) => {
+            if (!contextLost && isVisible && tabVisible) {
+              renderFrame(t);
+              scheduleNext();
+            }
+          });
+        }, frameInterval - 4); // −4ms to absorb setTimeout jitter
+      } else {
+        raf = requestAnimationFrame((t) => {
+          if (!contextLost && isVisible && tabVisible) {
+            renderFrame(t);
+            scheduleNext();
+          }
+        });
+      }
+    };
+
+    const loop = scheduleNext; // alias used by restart paths below
 
     const handleContextLost = (e: Event) => {
       e.preventDefault();
@@ -331,8 +340,9 @@ export const Plasma: React.FC<PlasmaProps> = ({
     const handleContextRestored = () => {
       contextLost = false;
       if (isVisible && tabVisible && !prefersReducedMotion) {
+        clearTimeout(rafTimeout);
         cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(loop);
+        scheduleNext();
       }
     };
     canvas.addEventListener("webglcontextlost", handleContextLost);
@@ -349,10 +359,11 @@ export const Plasma: React.FC<PlasmaProps> = ({
           tabVisible &&
           !prefersReducedMotion
         ) {
+          clearTimeout(rafTimeout);
           cancelAnimationFrame(raf);
-          lastFrameTime = performance.now();
-          raf = requestAnimationFrame(loop);
+          scheduleNext();
         } else if (!isVisible) {
+          clearTimeout(rafTimeout);
           cancelAnimationFrame(raf);
         }
       },
@@ -363,10 +374,11 @@ export const Plasma: React.FC<PlasmaProps> = ({
     const handleVisibilityChange = () => {
       tabVisible = document.visibilityState !== "hidden";
       if (tabVisible && isVisible && !contextLost && !prefersReducedMotion) {
+        clearTimeout(rafTimeout);
         cancelAnimationFrame(raf);
-        lastFrameTime = 0;
-        raf = requestAnimationFrame(loop);
+        scheduleNext();
       } else {
+        clearTimeout(rafTimeout);
         cancelAnimationFrame(raf);
       }
     };
@@ -376,20 +388,20 @@ export const Plasma: React.FC<PlasmaProps> = ({
     if (prefersReducedMotion) {
       renderStaticFrame();
     } else {
-      raf = requestAnimationFrame(loop);
+      scheduleNext();
     }
 
     return () => {
+      clearTimeout(rafTimeout);
       cancelAnimationFrame(raf);
       ro.disconnect();
       io.disconnect();
-      clearTimeout(scrollTimeout);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       canvas.removeEventListener("webglcontextlost", handleContextLost);
       canvas.removeEventListener("webglcontextrestored", handleContextRestored);
-      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", invalidateCachedRect);
       if (mouseInteractive) {
+        window.removeEventListener("scroll", handleScroll);
         window.removeEventListener("mousemove", handleMouseMove);
       }
       try {

@@ -167,7 +167,7 @@ export function TemplateGallery({
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {/* Blank Canvas Tile (Always first when in All or Flows) */}
         {(selectedCategory === 'all' || selectedCategory === 'flows') && !searchQuery && (
-          <div className="group flex flex-col justify-between border-2 border-dashed border-[var(--border)] hover:border-[var(--accent)] rounded-xl p-5 bg-[var(--surface)]/80 hover:bg-[var(--surface)] backdrop-blur-xs transition-all">
+          <div className="group flex flex-col justify-between border-2 border-dashed border-[var(--border)] hover:border-[var(--accent)] rounded-xl p-5 bg-[var(--surface)]/80 hover:bg-[var(--surface)] backdrop-blur-xs transition-all transform-gpu card-contain">
             <div>
               <div className="w-10 h-10 rounded-lg bg-[var(--paper-100)] flex items-center justify-center text-[var(--text-muted)] group-hover:text-[var(--accent)] group-hover:bg-[var(--accent-muted)] transition-colors mb-4">
                 <Plus size={20} />
@@ -276,7 +276,7 @@ function TemplateCard({
   }, [template.code, template.id])
 
   return (
-    <div className="group flex flex-col border border-[var(--border)] rounded-xl bg-[var(--surface)] overflow-hidden hover:border-[var(--ink-300)] hover:shadow-xs transition-all">
+    <div className="group flex flex-col border border-[var(--border)] rounded-xl bg-[var(--surface)] overflow-hidden hover:border-[var(--ink-300)] hover:shadow-xs transition-all transform-gpu card-contain">
       {/* Thumbnail visual with interactive overlay */}
       <div
         onClick={onPreview}
@@ -289,11 +289,19 @@ function TemplateCard({
             <Loader2 size={16} className="animate-spin text-[var(--accent)]" />
           </div>
         ) : svg ? (
-          <div
-            className="mermaid-preview w-full h-full flex items-center justify-center opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-200"
-            dangerouslySetInnerHTML={{ __html: svg }}
-            style={{ transform: 'scale(0.48)', transformOrigin: 'center center' }}
-          />
+          <>
+            {/* Outer wrapper handles hover transition; inner div holds fixed thumbnail scale */}
+            <div className="w-full h-full flex items-center justify-center opacity-85 group-hover:opacity-100 group-hover:scale-[1.04] transition-all duration-200 transform-gpu will-change-transform">
+              <div
+                className="mermaid-preview w-full h-full flex items-center justify-center"
+                dangerouslySetInnerHTML={{ __html: svg }}
+                style={{
+                  transform: 'scale(0.48) translateZ(0)',
+                  transformOrigin: 'center center',
+                }}
+              />
+            </div>
+          </>
         ) : (
           <div className="w-full h-full bg-[var(--paper-200)] rounded flex items-center justify-center text-xs text-[var(--text-muted)]">
             Preview

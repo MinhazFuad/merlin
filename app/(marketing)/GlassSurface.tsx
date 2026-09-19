@@ -266,6 +266,10 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
       width: typeof width === 'number' ? `${width}px` : width,
       height: typeof height === 'number' ? `${height}px` : height,
       borderRadius: `${borderRadius}px`,
+      transform: 'translate3d(0, 0, 0)',
+      WebkitTransform: 'translate3d(0, 0, 0)',
+      backfaceVisibility: 'hidden',
+      WebkitBackfaceVisibility: 'hidden',
       '--glass-frost': backgroundOpacity !== undefined ? String(backgroundOpacity) : undefined,
       '--glass-saturation': saturation !== undefined ? String(saturation) : undefined
     } as React.CSSProperties;

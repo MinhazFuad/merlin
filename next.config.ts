@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   experimental: {
-    optimizePackageImports: ['lucide-react', 'ogl'],
+    optimizePackageImports: ['lucide-react', 'ogl', 'date-fns'],
   },
 };
 
