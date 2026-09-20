@@ -85,22 +85,22 @@ export default function LandingPage() {
               {/* User-Oriented Product Marketing Strip */}
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 pt-6 border-t border-[var(--border)]/70 text-left w-full">
                 <div>
-                  <div className="text-[11px] font-mono font-semibold text-[var(--accent)] uppercase tracking-wider">Zero Friction</div>
+                  <div className="text-[11px] font-semibold text-[var(--accent)] uppercase tracking-wider">Zero Friction</div>
                   <div className="text-sm sm:text-base font-bold text-[var(--text)] mt-1">No Sign-Up Needed</div>
                   <div className="text-xs text-[var(--text-muted)] mt-0.5 leading-snug">Open and start diagramming immediately</div>
                 </div>
                 <div>
-                  <div className="text-[11px] font-mono font-semibold text-[var(--accent)] uppercase tracking-wider">Live Rendering</div>
+                  <div className="text-[11px] font-semibold text-[var(--accent)] uppercase tracking-wider">Live Rendering</div>
                   <div className="text-sm sm:text-base font-bold text-[var(--text)] mt-1">Instant Keystroke Sync</div>
                   <div className="text-xs text-[var(--text-muted)] mt-0.5 leading-snug">Real-time visual feedback with zero lag</div>
                 </div>
                 <div>
-                  <div className="text-[11px] font-mono font-semibold text-[var(--accent)] uppercase tracking-wider">Total Privacy</div>
+                  <div className="text-[11px] font-semibold text-[var(--accent)] uppercase tracking-wider">Total Privacy</div>
                   <div className="text-sm sm:text-base font-bold text-[var(--text)] mt-1">100% Local Processing</div>
                   <div className="text-xs text-[var(--text-muted)] mt-0.5 leading-snug">Your source code never leaves your browser</div>
                 </div>
                 <div>
-                  <div className="text-[11px] font-mono font-semibold text-[var(--accent)] uppercase tracking-wider">Production Export</div>
+                  <div className="text-[11px] font-semibold text-[var(--accent)] uppercase tracking-wider">Production Export</div>
                   <div className="text-sm sm:text-base font-bold text-[var(--text)] mt-1">Lossless SVG & Ultra HD</div>
                   <div className="text-xs text-[var(--text-muted)] mt-0.5 leading-snug">Crisp vectors ready for docs, decks & PRs</div>
                 </div>

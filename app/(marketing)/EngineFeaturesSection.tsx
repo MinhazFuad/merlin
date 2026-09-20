@@ -66,7 +66,7 @@ export default function EngineFeaturesSection() {
               </p>
             </div>
 
-            <div className="pt-4 border-t border-neutral-800 space-y-2 font-mono text-xs text-neutral-400">
+            <div className="pt-4 border-t border-neutral-800 space-y-2 text-xs text-neutral-400">
               <div className="flex items-center gap-2">
                 <Check size={13} className="text-emerald-500 shrink-0" />
                 <span>Zero-flicker debounced compiler</span>
@@ -96,7 +96,7 @@ export default function EngineFeaturesSection() {
               </p>
             </div>
 
-            <div className="pt-4 border-t border-neutral-800 space-y-2 font-mono text-xs text-neutral-400">
+            <div className="pt-4 border-t border-neutral-800 space-y-2 text-xs text-neutral-400">
               <div className="flex items-center gap-2">
                 <Check size={13} className="text-emerald-500 shrink-0" />
                 <span>Standards-compliant vector SVG</span>
@@ -126,7 +126,7 @@ export default function EngineFeaturesSection() {
               </p>
             </div>
 
-            <div className="pt-4 border-t border-neutral-800 space-y-2 font-mono text-xs text-neutral-400">
+            <div className="pt-4 border-t border-neutral-800 space-y-2 text-xs text-neutral-400">
               <div className="flex items-center gap-2">
                 <Check size={13} className="text-emerald-500 shrink-0" />
                 <span>Self-contained shareable links</span>
